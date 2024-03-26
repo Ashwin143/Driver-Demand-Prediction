@@ -18,6 +18,17 @@ from demand_model.config.core import DATASET_DIR,TRAINED_MODEL_DIR,config
 
 ##  Pre-Pipeline Preparation
 
+# combine datasets to one dataframe
+
+def combine_dataset(dataframe: pd.DataFrame, date_var: str):
+
+    new_train = pd.merge(train, meal_info, how = "left", on = "meal_id")
+    latest_train = pd.merge(new_train, fulfilment_center_info, how = "left", on = "center_id")
+    
+    return df
+
+
+
 def _load_raw_dataset(*,file_name:str) -> pd.DataFrame:
     dataframe=pd.read_csv(Path(f"{DATASET_DIR}/{file_name}"))
     return dataframe

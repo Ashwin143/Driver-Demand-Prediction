@@ -7,7 +7,7 @@ sys.path.append(str(root))
 
 from pathlib import Path
 from strictyaml import YAML, load
-
+from pydantic import BaseModel
 import demand_model
 
 #Project Directories
@@ -42,32 +42,27 @@ class ModelConfig(BaseModel):
     features: List[str]
     unused_fields: List[str]
     
-    date_var: str
-    yr_var: str
-    mnth_var: str
-    season_var: str
-    hr_var: str
-    holiday_var: str
-    workingday_var: str
-    weekday_var: str
-    weathersit_var: str
-    temp_var: str
-    atemp_var: str
-    hum_var: str
-    windspeed_var: str
-        
-    yr_mappings: Dict[int, int]
-    mnth_mappings: Dict[str, int]
-    season_mappings: Dict[str, int]
-    weathersit_mappings: Dict[str, int]
-    holiday_mappings: Dict[str, int]
-    workingday_mappings: Dict[str, int]
-    hr_mappings: Dict[str, int]
+
+    id: int
+    week: int
+    center_id: int
+    meal_id: int
+    checkout_price:int
+    base_price: int
+    emailer_for_promotion: int
+    homepage_featured:int
+    city_code: int
+    num_orders: int
+    category: str
+    cuisine: str
+    city_code:int
+    region_code:int
+    center_type:str
+    op_area:int
+
     
     test_size:float
-    random_state: int
-    n_estimators: int
-    max_depth: int
+    shuffle: bool
 
 
 class Config(BaseModel):
