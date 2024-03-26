@@ -3,7 +3,6 @@ from pathlib import Path
 
 file=Path(__file__).resolve()
 parent, root =file.parent, file.parent[1]
-
 sys.path.append(str(root))
 
 import typing as t
@@ -11,7 +10,6 @@ from pathlib import Path
 import joblib
 import pandas as pd
 from sklearn.pipeline import Pipeline
-
 from demand_model import __version__ as _version
 from demand_model.config.core import DATASET_DIR,TRAINED_MODEL_DIR,config
 
@@ -20,13 +18,32 @@ from demand_model.config.core import DATASET_DIR,TRAINED_MODEL_DIR,config
 
 # combine datasets to one dataframe
 
-def combine_dataset(dataframe: pd.DataFrame, date_var: str):
+
+
+
+
+
+def combine_dataset(train: pd.DataFrame, meal_info: pd.DataFrame,fulfilment_center_info: pd.DataFrame):
 
     new_train = pd.merge(train, meal_info, how = "left", on = "meal_id")
     latest_train = pd.merge(new_train, fulfilment_center_info, how = "left", on = "center_id")
+    new_test = pd.merge(test, meal_info, how = "left", on = "meal_id")
+    latest_test = pd.merge(new_test, fulfilment_center_info, how = "left", on = "center_id")
     
-    return df
+    return latest_train
 
+
+
+def pre_pipeline_preparation(*, data_frame: pd.DataFrame) -> pd.DataFrame:
+
+    data_frame = get_year_and_month(dataframe = data_frame, date_var = config.model_config.date_var)
+    
+    # Drop unnecessary fields
+    for field in config.model_config.unused_fields:
+        if field in data_frame.columns:
+            data_frame.drop(labels = field, axis=1, inplace=True)    
+
+    return data_frame
 
 
 def _load_raw_dataset(*,file_name:str) -> pd.DataFrame:
