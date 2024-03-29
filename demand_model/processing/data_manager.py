@@ -30,20 +30,20 @@ def combine_dataset(train: pd.DataFrame, meal_info: pd.DataFrame,fulfilment_cent
     new_test = pd.merge(test, meal_info, how = "left", on = "meal_id")
     latest_test = pd.merge(new_test, fulfilment_center_info, how = "left", on = "center_id")
     
-    return latest_train
+    return latest_train,latest_test
 
 
 
-def pre_pipeline_preparation(*, data_frame: pd.DataFrame) -> pd.DataFrame:
+def pre_pipeline_preparation(*, train: pd.DataFrame, meal_info: pd.DataFrame,fulfilment_center_info: pd.DataFrame) -> pd.DataFrame:
 
-    data_frame = get_year_and_month(dataframe = data_frame, date_var = config.model_config.date_var)
-    
+    data_frame_train, data_frame_test = combine_dataset(train, meal_info,fulfilment_center_info)
+
     # Drop unnecessary fields
-    for field in config.model_config.unused_fields:
-        if field in data_frame.columns:
-            data_frame.drop(labels = field, axis=1, inplace=True)    
+        # for field in config.model_config.unused_fields:
+        #     if field in data_frame.columns:
+        #         data_frame.drop(labels = field, axis=1, inplace=True)    
 
-    return data_frame
+    return data_frame_train, data_frame_test
 
 
 def _load_raw_dataset(*,file_name:str) -> pd.DataFrame:
@@ -53,14 +53,13 @@ def _load_raw_dataset(*,file_name:str) -> pd.DataFrame:
 def load_dataset(*,file_name:str) -> pd.DataFrame:
     dataframe=pd.read_csv(Path(f"{DATASET_DIR}/{file_name}"))
     transformed = pre_pipeline_preparation(data_frame = dataframe)
-
     return transformed
+
 
 def save_pipeline(*, pipeline_to_persist: Pipeline) -> None:
 
     save_file_name = f"{config.app_config.pipeline_save_file}{_version}.pkl"
     save_path = TRAINED_MODEL_DIR / save_file_name
-
     remove_old_pipelines(files_to_keep=[save_file_name])
     joblib.dump(pipeline_to_persist, save_path)
 
